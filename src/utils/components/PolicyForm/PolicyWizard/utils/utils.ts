@@ -21,6 +21,7 @@ import {
   getBondPortNames,
   getBondPorts,
   getBridgeInterface,
+  getBridgeManagementInterface,
   getBridgePorts,
   getLinkAggregationSettings,
   getOVNBridgeMapping,
@@ -68,6 +69,14 @@ export const updateBridgeName = (
   getOVNBridgeMapping(policy).bridge = newBridgeName;
   const bridgeInterface = getBridgeInterface(policy);
   if (bridgeInterface) bridgeInterface.name = newBridgeName;
+
+  const ovsInterface = getBridgeManagementInterface(policy);
+  if (ovsInterface) {
+    const oldOvsInterfaceName = ovsInterface.name;
+    ovsInterface.name = newBridgeName;
+    const ovsPort = getBridgePorts(policy)?.find((port) => port?.name === oldOvsInterfaceName);
+    if (ovsPort) ovsPort.name = newBridgeName;
+  }
 };
 
 const isCustomBridgeName = (bridgeName: string) =>
